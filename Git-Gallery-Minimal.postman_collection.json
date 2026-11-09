@@ -1,0 +1,400 @@
+{
+  "info": {
+    "name": "Git Gallery — Minimal fixture",
+    "description": "Run request 01 first to populate full commit SHAs. Successful analysis requests create jobs; inspect their final status after running the worker.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "repo_url",
+      "value": "https://github.com/FrankB45/csc325-capstone-test-minimal"
+    },
+    {
+      "key": "last_job_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 — Fetch commits and prepare selections",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"{{repo_url}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/api/repo/commits/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Commit history loaded\", () => pm.response.to.have.status(200));",
+              "if (pm.response.code === 200) {",
+              "  const data = pm.response.json();",
+              "  pm.test(\"Fixture has 20 commits\", () => pm.expect(data.commits.length).to.eql(20));",
+              "  const pick = numbers => numbers.map(n => data.commits[n - 1].sha);",
+              "  const groups = { homepage_shas: data.preselected, partial_shas: pick([1, 6, 12, 14, 20]), failed_shas: pick([1, 2, 3, 4, 5]), events_shas: pick([1, 9, 10, 18, 20]), regression_shas: pick([11, 12, 13, 14]), unchanged_shas: pick([7, 8]), too_many_shas: data.commits.slice(0, 11).map(c => c.sha), duplicate_shas: pick([1, 1]), unknown_shas: [\"0\".repeat(40)] };",
+              "  Object.entries(groups).forEach(([key, value]) => pm.collectionVariables.set(key, JSON.stringify(value)));",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 — Check compatibility",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"{{repo_url}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/api/repo/compatibility/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Accepted\", () => { pm.response.to.have.status(200); pm.expect(pm.response.json().overall_status).to.eql(\"accepted\"); pm.expect(pm.response.json().setup_available).to.eql(true); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 — Capture the homepage",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"{{repo_url}}\",\n  \"page_path\": \"index.html\",\n  \"commit_shas\": {{homepage_shas}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/api/analyses/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 202\", () => pm.response.to.have.status(202));",
+              "if (pm.response.code === 202) { const data = pm.response.json(); pm.test(\"Capture count\", () => pm.expect(data.total_captures).to.eql(10)); pm.collectionVariables.set(\"last_job_id\", data.job_id); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 — Mixed About results",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"{{repo_url}}\",\n  \"page_path\": \"about.html\",\n  \"commit_shas\": {{partial_shas}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/api/analyses/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 202\", () => pm.response.to.have.status(202));",
+              "if (pm.response.code === 202) { const data = pm.response.json(); pm.test(\"Capture count\", () => pm.expect(data.total_captures).to.eql(5)); pm.collectionVariables.set(\"last_job_id\", data.job_id); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 — All About captures fail",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"{{repo_url}}\",\n  \"page_path\": \"about.html\",\n  \"commit_shas\": {{failed_shas}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/api/analyses/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 202\", () => pm.response.to.have.status(202));",
+              "if (pm.response.code === 202) { const data = pm.response.json(); pm.test(\"Capture count\", () => pm.expect(data.total_captures).to.eql(5)); pm.collectionVariables.set(\"last_job_id\", data.job_id); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 — Mixed Events results",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"{{repo_url}}\",\n  \"page_path\": \"events.html\",\n  \"commit_shas\": {{events_shas}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/api/analyses/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 202\", () => pm.response.to.have.status(202));",
+              "if (pm.response.code === 202) { const data = pm.response.json(); pm.test(\"Capture count\", () => pm.expect(data.total_captures).to.eql(5)); pm.collectionVariables.set(\"last_job_id\", data.job_id); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 — Regression and repair",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"{{repo_url}}\",\n  \"page_path\": \"index.html\",\n  \"commit_shas\": {{regression_shas}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/api/analyses/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 202\", () => pm.response.to.have.status(202));",
+              "if (pm.response.code === 202) { const data = pm.response.json(); pm.test(\"Capture count\", () => pm.expect(data.total_captures).to.eql(4)); pm.collectionVariables.set(\"last_job_id\", data.job_id); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 — Identical homepage pair",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"{{repo_url}}\",\n  \"page_path\": \"index.html\",\n  \"commit_shas\": {{unchanged_shas}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/api/analyses/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 202\", () => pm.response.to.have.status(202));",
+              "if (pm.response.code === 202) { const data = pm.response.json(); pm.test(\"Capture count\", () => pm.expect(data.total_captures).to.eql(2)); pm.collectionVariables.set(\"last_job_id\", data.job_id); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 — Reject eleven commits",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"{{repo_url}}\",\n  \"page_path\": \"index.html\",\n  \"commit_shas\": {{too_many_shas}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/api/analyses/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 — Reject duplicate SHA",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"{{repo_url}}\",\n  \"page_path\": \"index.html\",\n  \"commit_shas\": {{duplicate_shas}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/api/analyses/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 — Reject unknown SHA",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"{{repo_url}}\",\n  \"page_path\": \"index.html\",\n  \"commit_shas\": {{unknown_shas}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/api/analyses/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+
