@@ -18,7 +18,7 @@ h3 { font-family: Georgia, serif; font-size: 23px; font-weight: normal; line-hei
 .hero-art { width: 440px; max-width: 100%; height: auto; border-radius: 8px; }
 .button { display: inline-block; background: #2b6559; color: #ffffff; padding: 12px 22px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: bold; }
 section + section { margin-top: 64px; }
-.shelf { display: block; flex-wrap: wrap; gap: 20px; }
+.shelf { display: flex; flex-wrap: wrap; gap: 20px; }
 .book { flex: 1 1 240px; padding: 26px; background: #fffdf7; border: 1px solid #dedacc; border-top: 4px solid #2b6559; border-radius: 4px; margin-bottom: 16px; }
 .book h3 { font-size: 23px; }
 .book p { color: #52685b; }
