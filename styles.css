@@ -1,6 +1,6 @@
 * { box-sizing: border-box; }
 body { margin: 0; background: #f7f3e9; color: #29473c; font-family: Arial, Helvetica, sans-serif; font-size: 17px; line-height: 1.65; }
-a { color: #2b6559; text-underline-offset: 5px; }
+a { color: #a24b2d; text-underline-offset: 5px; }
 .site-header, main, .site-footer { max-width: 1160px; margin: 0 auto; padding: 28px; }
 .site-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; border-bottom: 1px solid #d9d7c9; }
 .brand { color: #29473c; font-family: Georgia, serif; font-size: 27px; font-weight: bold; text-decoration: none; }
@@ -11,15 +11,15 @@ h1, h2, h3, p { margin-top: 0; }
 h1 { font-family: Georgia, serif; font-size: 50px; font-weight: normal; line-height: 1.1; letter-spacing: -1px; margin-bottom: 24px; }
 h2 { font-family: Georgia, serif; font-size: 34px; font-weight: normal; line-height: 1.25; margin-bottom: 24px; }
 h3 { font-family: Georgia, serif; font-size: 23px; font-weight: normal; line-height: 1.3; }
-.eyebrow { color: #2b6559; font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; }
+.eyebrow { color: #a24b2d; font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; }
 .lede { font-size: 20px; color: #52685b; max-width: 570px; }
 .hero { display: flex; align-items: center; flex-wrap: wrap; gap: 36px; }
 .hero-copy { flex: 1 1 360px; }
 .hero-art { width: 440px; max-width: 100%; height: auto; border-radius: 8px; }
-.button { display: inline-block; background: #2b6559; color: #ffffff; padding: 12px 22px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: bold; }
+.button { display: inline-block; background: #a24b2d; color: #ffffff; padding: 12px 22px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: bold; }
 section + section { margin-top: 64px; }
 .shelf { display: flex; flex-wrap: wrap; gap: 20px; }
-.book { flex: 1 1 240px; padding: 26px; background: #fffdf7; border: 1px solid #dedacc; border-top: 4px solid #2b6559; border-radius: 4px; margin-bottom: 16px; }
+.book { flex: 1 1 240px; padding: 26px; background: #fffdf7; border: 1px solid #dedacc; border-top: 4px solid #a24b2d; border-radius: 4px; margin-bottom: 16px; }
 .book h3 { font-size: 23px; }
 .book p { color: #52685b; }
 .category { font-size: 11px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
@@ -27,7 +27,7 @@ section + section { margin-top: 64px; }
 .visit { display: flex; gap: 40px; flex-wrap: wrap; background: #e6ecdf; padding: 34px; border-radius: 8px; }
 .visit div { flex: 1 1 280px; }
 .visit p { margin-bottom: 8px; }
-.announcement { background: #2b6559; color: #ffffff; padding: 34px; border-radius: 8px; }
+.announcement { background: #a24b2d; color: #ffffff; padding: 34px; border-radius: 8px; }
 .announcement p { max-width: 720px; margin-bottom: 0; }
 .noticeboard { display: flex; flex-wrap: wrap; gap: 28px; }
 .notice { flex: 1 1 300px; border-top: 2px solid #c6cdbd; padding-top: 22px; }
